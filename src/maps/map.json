@@ -1,0 +1,26 @@
+{
+	"class":"dungeon",
+	"name":"root",
+	"rows":24,
+	"cols":80,
+	"default":"floor",
+	
+	"structures": [
+		{
+			"class":"room",
+			"name":"da box",
+			"rows":5,
+			"cols":5,
+			"xpos":3,
+			"ypos":5
+		},
+		{
+			"class":"room",
+			"name":"city walls",
+			"rows":32,
+			"cols":32,
+			"xpos":0,
+			"ypos":0
+		}
+	]
+}
