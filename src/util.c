@@ -14,22 +14,17 @@ static char *read_until(const char *string, char token)
 	char *word = malloc(word_len * sizeof(char));
 	if (!word) die("malloc(): %i", errno);
 	memset(word, 0, word_len * sizeof(char));
-	fprintf(stderr, "stage A\n");
 	
 	while ((c = string[index]) != token && c) {
-		fprintf(stderr, "stage B: %c\n", c);
 		if (index >= word_len - 2) {
 			word_len = word_len * 2;
 			word = realloc(word, word_len * sizeof(char));
 			if (!word) die("realloc(): %i", errno);
 			memset(word+index, 0, word_len - (word_len/2));
-			fprintf(stderr, "critical stage X\n");
 		}
 		word[index++] = c;
-		fprintf(stderr, "stage C\n");
 	}
 	word[index] = '\0';
-	fprintf(stderr, "critical stage Y\n");
 	return word;
 }
 
@@ -44,7 +39,6 @@ char **split_string(const char *string, char token)
 	char **list = malloc(list_len * sizeof(char *)); // legendary
 	if (!list) die("malloc(): %i", errno);
 	memset(list, 0, list_len * sizeof(char *));
-	fprintf(stderr,"stage 1\n");
 
 	// double null the string
 	alt_len = strlen(string) + 2;
@@ -53,21 +47,36 @@ char **split_string(const char *string, char token)
 	alt_string[alt_len - 1] = '\0';
 	
 	while ((word = read_until(alt_string + read_length, token)) && *word) {
-		fprintf(stderr, "stage 2: %s\n", word);
 		if (index >= list_len - 2) {
 			list_len = list_len * 2;
 			list = realloc(list, list_len * sizeof(char *));
 			if (!list) die("realloc(): %i", errno);
-			fprintf(stderr, "critical stage 1\n");
 		}
 		list[index++] = word;
 		// the next line is why we double null
 		read_length = read_length + strlen(word) + 1;
-		fprintf(stderr, "stage 3\n");
 	}
 	list[index] = NULL;
-	fprintf(stderr, "critical stge 2\n");
 	return list;
+}
+
+void free_ptrArray(char **array)
+{
+	char *ptr = *array;
+	for (int i = 0; ptr; ptr = array[++i]) {
+		free(ptr);
+	}
+	free(array);
+}
+
+unsigned int string_compare(const char *str1, const char *str2, int n)
+{
+	int matches = 0;
+	for (int i = 0; i < n; i++) {
+		if (str1[i] != str2[i]) break;
+		matches++;
+	}
+	return matches;
 }
 
 void mega_die(struct Interface *ui, const char *fmt, ...) 

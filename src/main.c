@@ -13,10 +13,13 @@ int main(int argc, char **argv)
 	worldMap_Init(&m, &p);
 
 	// fair warning; i was drunk when i wrote most of this
+	int result;
 	struct InterfaceInput input;
-	while (worldMap_GetInput(&i, &m, &input)) {
+	while ((result = worldMap_GetInput(&i, &m, &input))) {
 		worldMap_Step(&i, &m, &input);
 	}
+
+	worldMap_Shutdown();
 	interface_Shutdown(&i);
 
 	return 0;

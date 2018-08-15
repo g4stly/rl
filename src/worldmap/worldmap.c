@@ -6,26 +6,35 @@
 #include "../util.h"
 
 
-static int console_read(struct Interface *ui, struct InterfaceInput *input)
+static int console_read(struct Interface *ui, struct WorldMap *m, struct InterfaceInput *input)
 {
 	ui->ReadLine(ui, input);
 	ui->WriteLine(ui, input->content);
+	int result;
 	char **words = split_string(input->content, ' ');
+	char *word = *words;
 
-	char *word = words[0];
-	for (int i = 0; word; word = words[++i]) {
-		ui->WriteLine(ui, word);	
-		free(word);
+	// test first word against entire list of commands
+	// they entered the one with the most collisions
+	struct Command cmd;
+	memset(&cmd, 0, sizeof(struct Command));
+	command_try(&cmd, word, words);
+	if (!cmd.func) {
+		ui->WriteLine(ui, "%s: no such command found.", word);
+		free_ptrArray(words);
+		return 1;
 	}
 
-	free(words);
-	return 1;
+	result = cmd.func(ui, m, words);
+	free_ptrArray(words);
+	return result;
 }
 
 
 
 void worldMap_Init(struct WorldMap *map, struct Player *player)
 {
+	load_commands();
 	map->array[3] = 8;
 	map->player = player;
 }
@@ -36,10 +45,10 @@ int worldMap_GetInput(struct Interface *ui,
 	char c = ui->ReadKey(ui);
 	switch (c) {
 	case 'l':
-		ui->WriteLine(ui, "You take a look around...");
+		command(ui, "look", NULL);
 		return 1;
 	case 't':
-		return console_read(ui, input);
+		return console_read(ui, map, input);
 	case 'q':
 		return 0;
 	default:
@@ -52,4 +61,9 @@ int worldMap_GetInput(struct Interface *ui,
 void worldMap_Step(struct Interface *ui, 
 	struct WorldMap *map, struct InterfaceInput *input)
 {
+}
+
+void worldMap_Shutdown(void)
+{
+	unload_commands();
 }

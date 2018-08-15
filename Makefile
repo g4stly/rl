@@ -9,6 +9,7 @@ TARGET 	= build/rl
 SOURCES = src/main.c src/util.c
 SOURCES += src/player/player.c
 SOURCES += src/worldmap/worldmap.c
+SOURCES += src/worldmap/commands.c
 SOURCES += src/interface/interface.c
 SOURCES += src/list/list.c
 OBJECTS	= $(SOURCES:.c=.o)

@@ -7,7 +7,13 @@
 
 static struct ListNode *commands = NULL;
 
-static int echo_cmd(struct Interface *ui, char **argv)
+static int look_cmd(struct Interface *ui, struct WorldMap *m, char **argv)
+{
+	ui->WriteLine(ui, "You take a quick look around...");
+	return 1;
+}
+
+static int echo_cmd(struct Interface *ui, struct WorldMap *m, char **argv)
 {
 	char *word = *argv;
 	for (int i = 0; word; word = argv[++i]) {
@@ -16,7 +22,7 @@ static int echo_cmd(struct Interface *ui, char **argv)
 	return 1;
 }
 
-static int quit_cmd(struct Interface *ui, char **argv)
+static int quit_cmd(struct Interface *ui, struct WorldMap *m, char **argv)
 {
 	return 0;
 }
@@ -56,7 +62,16 @@ void command_try(struct Command *cmd, const char *word, char **words)
 	}
 }
 
-static void mkcmd(const char *name, int (*fn)(struct Interface *, char **))
+int command(struct Interface *ui, struct WorldMap *m, const char *word, char **words)
+{
+	struct Command cmd;
+	memset(&cmd, 0, sizeof(struct Command));
+	command_try(&cmd, word, words);	
+	if (!cmd.func) return 1;
+	return cmd.func(ui, m, words);
+}
+
+static void mkcmd(const char *name, int (*fn)(struct Interface *, struct WorldMap *, char **))
 {
 	struct Command *leak = malloc(sizeof(struct Command));
 	if (!leak) { die("malloc():"); }
@@ -70,6 +85,7 @@ static void mkcmd(const char *name, int (*fn)(struct Interface *, char **))
 
 void load_commands(void)
 {
+	mkcmd("look", look_cmd);
 	mkcmd("echo", echo_cmd);
 	mkcmd("quit", quit_cmd);
 	mkcmd("exit", quit_cmd);
