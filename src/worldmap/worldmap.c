@@ -31,12 +31,12 @@ static int console_read(struct Interface *ui, struct WorldMap *m, struct Interfa
 }
 
 
-
 void worldMap_Init(struct WorldMap *map, struct Player *player)
 {
 	load_commands();
-	map->array[3] = 8;
 	map->player = player;
+	memset(map->levels, 0, sizeof(struct Map) * 5);
+	load_level(&map->levels[0], "src/maps/maps.json");
 }
 
 int worldMap_GetInput(struct Interface *ui, 
@@ -45,7 +45,7 @@ int worldMap_GetInput(struct Interface *ui,
 	char c = ui->ReadKey(ui);
 	switch (c) {
 	case 'l':
-		command(ui, "look", NULL);
+		command(ui, map, "look", NULL);
 		return 1;
 	case 't':
 		return console_read(ui, map, input);

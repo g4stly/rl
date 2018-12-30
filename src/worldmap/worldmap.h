@@ -4,10 +4,26 @@
 #include "../player/player.h"
 #include "../interface/interface.h"
 
-#define CMD_NAME_LEN 12
+#define CMD_NAME_LEN 	12
+#define MAP_ROWS 	32
+#define MAP_COLS	32
+
+struct Tile {
+	char ch;
+};
+
+struct Space {
+	int wall;
+	struct Tile *floor;
+	void *occupant;
+};
+
+struct Map {
+	struct Space map[MAP_ROWS * MAP_COLS];
+};
 
 struct WorldMap {
-	int array[64];
+	struct Map levels[5];	
 	struct Player *player;
 };
 
@@ -15,6 +31,7 @@ struct Command {
 	char name[CMD_NAME_LEN];
 	int (*func)(struct Interface *ui, struct WorldMap *m, char **argv);
 };
+
 
 void worldMap_Init(
 	struct WorldMap *map, 
@@ -32,11 +49,15 @@ void worldMap_Step(
 
 void worldMap_Shutdown(void);
 
+// load_level.c
+void load_level(struct Map *m, const char *filename);
+
 // these are defined in commands.c
 void command_try(struct Command *cmd,
 	const char *word,
 	char **words);
 int command(struct Interface *ui,
+	struct WorldMap *m,
 	const char *word,
 	char **words);
 void load_commands(void);

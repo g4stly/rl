@@ -88,7 +88,6 @@ void load_commands(void)
 	mkcmd("look", look_cmd);
 	mkcmd("echo", echo_cmd);
 	mkcmd("quit", quit_cmd);
-	mkcmd("exit", quit_cmd);
 }
 
 void unload_commands(void)
