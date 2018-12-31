@@ -1,26 +1,27 @@
 {
-	"class":"dungeon",
-	"name":"root",
 	"rows":24,
 	"cols":80,
-	"default":"floor",
-	
-	"structures": [
+	"tile":"floor",
+	"hollow":false,
+	"structures": 
+	[
 		{
-			"class":"room",
-			"name":"da box",
-			"rows":5,
-			"cols":5,
-			"xpos":3,
-			"ypos":5
+			"rows":4,
+			"cols":4,
+			"xpos":2,
+			"ypos":2,
+			"tile":"wall",
+			"hollow":true
 		},
 		{
-			"class":"room",
-			"name":"city walls",
-			"rows":32,
-			"cols":32,
-			"xpos":0,
-			"ypos":0
+			"rows":3,
+			"cols":20,
+			"xpos":9,
+			"ypos":9,
+			"tile":"wall",
+			"hollow":false
 		}
-	]
+	],
+	"xpos": 0,
+	"ypos": 0
 }

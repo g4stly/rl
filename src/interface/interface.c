@@ -207,7 +207,7 @@ void interface_Init(struct Interface *i)
 		game_win_rows, 0, 0);
 	i->console_buffer = NULL;
 
-	// register functions
+	// register functions (dep injection)
 	i->Move		= &interface_move;
 	i->ReadKey 	= &interface_readkey;
 	i->PutChar 	= &interface_putchar;

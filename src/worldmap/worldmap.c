@@ -36,7 +36,7 @@ void worldMap_Init(struct WorldMap *map, struct Player *player)
 	load_commands();
 	map->player = player;
 	memset(map->levels, 0, sizeof(struct Map) * 5);
-	load_level(&map->levels[0], "src/maps/maps.json");
+	load_level(&map->levels[0], "src/maps/map.json");
 }
 
 int worldMap_GetInput(struct Interface *ui, 

@@ -5,8 +5,6 @@
 #include "../interface/interface.h"
 
 #define CMD_NAME_LEN 	12
-#define MAP_ROWS 	32
-#define MAP_COLS	32
 
 struct Tile {
 	char ch;
@@ -19,7 +17,8 @@ struct Space {
 };
 
 struct Map {
-	struct Space map[MAP_ROWS * MAP_COLS];
+	// array
+	struct Space *map;
 };
 
 struct WorldMap {

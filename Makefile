@@ -1,7 +1,7 @@
 CC 	= gcc
 CFLAGS 	= -Wall -c -g
 
-LIBS 	= -lncurses
+LIBS 	= -lncurses -ljsmn
 LIBDIR	= lib
 INCLUDE	= include
 
