@@ -1,7 +1,7 @@
 CC 	= gcc
 CFLAGS 	= -Wall -c -g
 
-LIBS 	= -lncurses -ljsmn
+LIBS 	= -lncurses -ljsmn -lm
 LIBDIR	= lib
 INCLUDE	= include
 
@@ -11,6 +11,7 @@ SOURCES += src/player/player.c
 SOURCES += src/worldmap/worldmap.c
 SOURCES += src/worldmap/commands.c
 SOURCES += src/worldmap/load_level.c
+SOURCES += src/worldmap/tiles.c
 SOURCES += src/interface/interface.c
 SOURCES += src/list/list.c
 OBJECTS	= $(SOURCES:.c=.o)

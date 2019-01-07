@@ -13,6 +13,25 @@ static int look_cmd(struct Interface *ui, struct WorldMap *m, char **argv)
 	return 1;
 }
 
+static int move_cmd(struct Interface *ui, struct WorldMap *m, char **argv)
+{
+	switch (**argv) {
+	case 'n':
+		m->player->ypos -= 1;
+		break;
+	case 's':
+		m->player->ypos += 1;
+		break;
+	case 'e':
+		m->player->xpos += 1;
+		break;
+	case 'w':
+		m->player->xpos -= 1;
+		break;
+	}
+	return 1;
+}
+
 static int echo_cmd(struct Interface *ui, struct WorldMap *m, char **argv)
 {
 	char *word = *argv;
@@ -87,6 +106,7 @@ void load_commands(void)
 {
 	mkcmd("look", look_cmd);
 	mkcmd("echo", echo_cmd);
+	mkcmd("move", move_cmd);
 	mkcmd("quit", quit_cmd);
 }
 

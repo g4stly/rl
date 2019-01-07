@@ -189,6 +189,7 @@ void interface_Init(struct Interface *i)
 	int rows, cols;
 	getmaxyx(stdscr, rows, cols);
 	int game_win_rows = (rows / 4) * 3;
+	if (!game_win_rows % 2) game_win_rows++;
 	int game_win_cols = game_win_rows * 2;
 
 	i->game_win = window_create(

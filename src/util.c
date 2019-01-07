@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "util.h"
+#include "interface/main_ui.h"
 
 static char *read_until(const char *string, char token)
 {
@@ -97,6 +98,7 @@ void mega_die(struct Interface *ui, const char *fmt, ...)
 
 void die(const char *fmt, ...) 
 {
+	interface_Shutdown(main_ui);
 	va_list ap;
 	va_start(ap, fmt);
 	vfprintf(stderr, fmt, ap);

@@ -8,17 +8,13 @@
 
 struct Tile {
 	char ch;
-};
-
-struct Space {
 	int wall;
-	struct Tile *floor;
-	void *occupant;
 };
 
 struct Map {
 	// array
-	struct Space *map;
+	int cols, rows;
+	struct Tile **map;
 };
 
 struct WorldMap {
@@ -32,9 +28,7 @@ struct Command {
 };
 
 
-void worldMap_Init(
-	struct WorldMap *map, 
-	struct Player *player);
+void worldMap_Init(struct WorldMap *map);
 
 int worldMap_GetInput(
 	struct Interface *ui, 
@@ -46,15 +40,21 @@ void worldMap_Step(
 	struct WorldMap *map, 
 	struct InterfaceInput *input);
 
-void worldMap_Shutdown(void);
+void worldMap_Draw(
+	struct Interface *ui, 
+	struct WorldMap *map);
+
+void worldMap_Shutdown(struct WorldMap *map);
 
 // load_level.c
 void load_level(struct Map *m, const char *filename);
+void unload_level(struct Map *m);
 
-// these are defined in commands.c
+// commands.c
 void command_try(struct Command *cmd,
 	const char *word,
 	char **words);
+
 int command(struct Interface *ui,
 	struct WorldMap *m,
 	const char *word,

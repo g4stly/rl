@@ -4,7 +4,9 @@
 #include "../interface/interface.h"
 
 struct Player {
+	char ch;
 	char name[32];
+	int xpos, ypos;
 };
 
 void player_Init(

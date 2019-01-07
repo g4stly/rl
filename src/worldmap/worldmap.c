@@ -1,7 +1,10 @@
+#include <math.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ncurses.h>
 #include "worldmap.h"
+#include "tiles.h"
 #include "../interface/interface.h"
 #include "../util.h"
 
@@ -31,14 +34,18 @@ static int console_read(struct Interface *ui, struct WorldMap *m, struct Interfa
 }
 
 
-void worldMap_Init(struct WorldMap *map, struct Player *player)
+void worldMap_Init(struct WorldMap *map)
 {
+	init_tiles();
 	load_commands();
-	map->player = player;
 	memset(map->levels, 0, sizeof(struct Map) * 5);
 	load_level(&map->levels[0], "src/maps/map.json");
 }
 
+static char * north[] = {"north"};
+static char * south[] = {"south"};
+static char * east[] = {"east"};
+static char * west[] = {"west"};
 int worldMap_GetInput(struct Interface *ui, 
 	struct WorldMap *map, struct InterfaceInput *input)
 {
@@ -46,6 +53,18 @@ int worldMap_GetInput(struct Interface *ui,
 	switch (c) {
 	case 'l':
 		command(ui, map, "look", NULL);
+		return 1;
+	case 'w':
+		command(ui, map, "move", north);
+		return 1;
+	case 'a':
+		command(ui, map, "move", west);
+		return 1;
+	case 's':
+		command(ui, map, "move", south);
+		return 1;
+	case 'd':
+		command(ui, map, "move", east);
 		return 1;
 	case 't':
 		return console_read(ui, map, input);
@@ -63,7 +82,32 @@ void worldMap_Step(struct Interface *ui,
 {
 }
 
-void worldMap_Shutdown(void)
+void worldMap_Draw(struct Interface *ui, struct WorldMap *map)
+{
+	struct Map *m = &map->levels[0];
+	struct Window *w = ui->game_win;
+	int mapi, mapy, mapx;
+	int centerx = (w->cols/2);
+	int centery = (w->rows/2);
+	for (int y = 0; y < w->rows; y++) {
+		mapy = map->player->ypos - (w->rows/2) + y;
+		for (int x = 0; x < w->cols; x++) {
+			mapx = map->player->xpos - (w->cols/2) + x;
+			mapi = mapy * m->cols + mapx;
+			mvwaddch(w->win, y, x, 
+				(mapi < 0 || mapi >= m->cols * m->rows) 
+				|| (mapx < 0 || mapx >= m->cols)
+				|| (mapy < 0 || mapy >= m->rows)
+				? ' ' : m->map[mapi]->ch);
+		}
+	}
+	mvwaddch(w->win, centery, centerx, map->player->ch);
+	wrefresh(ui->game_win->win);
+}
+
+void worldMap_Shutdown(struct WorldMap *map)
 {
 	unload_commands();
+	unload_level(&map->levels[0]);
+	destroy_tiles();
 }
