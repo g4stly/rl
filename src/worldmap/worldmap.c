@@ -12,10 +12,16 @@
 static int console_read(struct Interface *ui, struct WorldMap *m, struct InterfaceInput *input)
 {
 	ui->ReadLine(ui, input);
+	if (input->content == NULL) {
+		return 1;
+	}
 	ui->WriteLine(ui, input->content);
-	int result;
+	int result = 0;
 	char **words = split_string(input->content, ' ');
-	char *word = *words;
+	char *word;
+
+	while ((word = words[++result]));
+	word = *words;
 
 	// test first word against entire list of commands
 	// they entered the one with the most collisions
@@ -28,7 +34,8 @@ static int console_read(struct Interface *ui, struct WorldMap *m, struct Interfa
 		return 1;
 	}
 
-	result = cmd.func(ui, m, words);
+	// result holds argc
+	result = cmd.func(ui, m, words, result);
 	free_ptrArray(words);
 	return result;
 }
@@ -42,39 +49,50 @@ void worldMap_Init(struct WorldMap *map)
 	load_level(&map->levels[0], "src/maps/map.json");
 }
 
-static char * north[] = {"north"};
-static char * south[] = {"south"};
-static char * east[] = {"east"};
-static char * west[] = {"west"};
-int worldMap_GetInput(struct Interface *ui, 
-	struct WorldMap *map, struct InterfaceInput *input)
+static char command_buffer = 0;	// LOL
+static char *const move_literal = "move";
+static char * north[] = {move_literal, "north"};
+static char * south[] = {move_literal, "south"};
+static char * east[] = {move_literal, "east"};
+static char * west[] = {move_literal, "west"};
+static int rl(struct Interface *ui,
+	struct WorldMap *map, struct InterfaceInput *input, char c)
 {
-	char c = ui->ReadKey(ui);
 	switch (c) {
 	case 'l':
-		command(ui, map, "look", NULL);
-		return 1;
+		command(ui, map, "look", NULL, 0);
+		break;
+	case 'r':
+		return rl(ui, map, input, command_buffer);
 	case 'w':
-		command(ui, map, "move", north);
-		return 1;
+		command(ui, map, north[0], north, 2);
+		break;
 	case 'a':
-		command(ui, map, "move", west);
-		return 1;
+		command(ui, map, west[0], west, 2);
+		break;
 	case 's':
-		command(ui, map, "move", south);
-		return 1;
+		command(ui, map, south[0], south, 2);
+		break;
 	case 'd':
-		command(ui, map, "move", east);
-		return 1;
+		command(ui, map, east[0], east, 2);
+		break;
 	case 't':
 		return console_read(ui, map, input);
 	case 'q':
 		return 0;
 	default:
+		if (c < 32) c = ' ';
 		ui->WriteLine(ui, "%c: Not a valid command!", c);
-		return 1;
+		break;
 	}
+	if (c != 'r') command_buffer = c;
 	return 1;
+}
+
+int worldMap_GetInput(struct Interface *ui, 
+	struct WorldMap *map, struct InterfaceInput *input)
+{
+	return rl(ui, map, input, ui->ReadKey(ui));
 }
 
 void worldMap_Step(struct Interface *ui, 

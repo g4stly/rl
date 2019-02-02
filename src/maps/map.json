@@ -7,53 +7,25 @@
 		{
 			"rows":80,
 			"cols":80,
-			"tile":"wall",
 			"hollow":true,
-			"structures":
-			[
+			"tile":"wall",
+			"structues":[
 				{
-					"xpos":3,
+					"xpos":10,
 					"ypos":3,
-					"rows":2,
-					"cols":2,
-					"tile":"wall"
-				},
-				{
-					"xpos":7,
-					"ypos":3,
-					"rows":2,
-					"cols":2,
-					"tile":"wall"
-				},
-				{
-					"xpos":11,
-					"ypos":3,
-					"rows":2,
-					"cols":2,
-					"tile":"wall"
-				},
-				{
-					"xpos":15,
-					"ypos":3,
-					"rows":2,
-					"cols":2,
-					"tile":"wall"
-				},
-				{
-					"xpos":19,
-					"ypos":3,
-					"rows":2,
-					"cols":2,
-					"tile":"wall"
-				},
-				{
-					"xpos":23,
-					"ypos":3,
-					"rows":2,
-					"cols":2,
-					"tile":"wall"
+					"rows":10,
+					"cols":14,
+					"tile":"floor",
+					"structures":[
+						{
+							"rows":10,
+							"cols":14,
+							"tile":"wall",
+							"hollow":true
+						}
+					]
 				}
-			]
+			]	
 		}
 	]
 }

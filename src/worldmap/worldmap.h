@@ -24,7 +24,7 @@ struct WorldMap {
 
 struct Command {
 	char name[CMD_NAME_LEN];
-	int (*func)(struct Interface *ui, struct WorldMap *m, char **argv);
+	int (*func)(struct Interface *ui, struct WorldMap *m, char **argv, int argc);
 };
 
 
@@ -58,7 +58,8 @@ void command_try(struct Command *cmd,
 int command(struct Interface *ui,
 	struct WorldMap *m,
 	const char *word,
-	char **words);
+	char **words,
+	int argc);
 void load_commands(void);
 void unload_commands(void);
 

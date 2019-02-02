@@ -7,32 +7,55 @@
 
 static struct ListNode *commands = NULL;
 
-static int look_cmd(struct Interface *ui, struct WorldMap *m, char **argv)
+static int look_cmd(struct Interface *ui, struct WorldMap *m, char **argv, int argc)
 {
 	ui->WriteLine(ui, "You take a quick look around...");
 	return 1;
 }
 
-static int move_cmd(struct Interface *ui, struct WorldMap *m, char **argv)
+static int move_cmd(struct Interface *ui, struct WorldMap *m, char **argv, int argc)
 {
-	switch (**argv) {
+	if (argc < 2) { 
+		ui->WriteLine(ui, "move where?!?");
+		return 1;
+	}
+
+	int targetx = m->player->xpos;
+	int targety = m->player->ypos;
+	struct Map lvl = m->levels[m->player->zpos];
+	switch (*argv[1]) {
 	case 'n':
-		m->player->ypos -= 1;
+		targety -= 1;
 		break;
 	case 's':
-		m->player->ypos += 1;
+		targety += 1;
 		break;
 	case 'e':
-		m->player->xpos += 1;
+		targetx += 1;
 		break;
 	case 'w':
-		m->player->xpos -= 1;
+		targetx -= 1;
 		break;
 	}
+
+	int targeti = targety * lvl.cols + targetx;
+	if (targeti < 0 || targeti >= lvl.cols * lvl.rows) { 
+		ui->WriteLine(ui, "Out of map bounds!");
+		return -1;
+	}
+
+	if (lvl.map[targeti]->wall) {
+		// ui->WriteLine(ui, "You walk straight into a wall!");
+		return -1;
+	}
+
+	m->player->xpos = targetx;
+	m->player->ypos = targety;
+
 	return 1;
 }
 
-static int echo_cmd(struct Interface *ui, struct WorldMap *m, char **argv)
+static int echo_cmd(struct Interface *ui, struct WorldMap *m, char **argv, int argc)
 {
 	char *word = *argv;
 	for (int i = 0; word; word = argv[++i]) {
@@ -41,7 +64,7 @@ static int echo_cmd(struct Interface *ui, struct WorldMap *m, char **argv)
 	return 1;
 }
 
-static int quit_cmd(struct Interface *ui, struct WorldMap *m, char **argv)
+static int quit_cmd(struct Interface *ui, struct WorldMap *m, char **argv, int argc)
 {
 	return 0;
 }
@@ -81,16 +104,16 @@ void command_try(struct Command *cmd, const char *word, char **words)
 	}
 }
 
-int command(struct Interface *ui, struct WorldMap *m, const char *word, char **words)
+int command(struct Interface *ui, struct WorldMap *m, const char *word, char **words, int argc)
 {
 	struct Command cmd;
 	memset(&cmd, 0, sizeof(struct Command));
 	command_try(&cmd, word, words);	
 	if (!cmd.func) return 1;
-	return cmd.func(ui, m, words);
+	return cmd.func(ui, m, words, argc);
 }
 
-static void mkcmd(const char *name, int (*fn)(struct Interface *, struct WorldMap *, char **))
+static void mkcmd(const char *name, int (*fn)(struct Interface *, struct WorldMap *, char **, int))
 {
 	struct Command *leak = malloc(sizeof(struct Command));
 	if (!leak) { die("malloc():"); }

@@ -113,7 +113,7 @@ static struct level *parse_level(const char *buffer, jsmntok_t *data, int *data_
 	int size = data[(*data_idx)++].size;
 	fprintf(stderr, "read %i fields\n", size);
 	for (data_idx; proccessed < size; (*data_idx) += 2) {
-		fprintf(stderr, "parsing #%i - parsed %i\n", *data_idx, proccessed);
+		fprintf(stderr, "parsing #%i - parsed %i(%i)\n", *data_idx, proccessed, size);
 		int field = -1;
 		for (int j = 0; j < FIELDS; j++) {
 			int mismatch = strncmp(buffer+data[*data_idx].start, fields[j], 4);

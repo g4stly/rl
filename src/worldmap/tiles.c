@@ -14,7 +14,7 @@ void init_tiles() {
 	tiles[FLOOR_TILE] = malloc(sizeof(struct Tile));
 	if (!tiles[FLOOR_TILE]) { die("initialize_tiles(): malloc():"); }
 	tiles[FLOOR_TILE]->ch = '.';
-	tiles[FLOOR_TILE]->wall = 1;
+	tiles[FLOOR_TILE]->wall = 0;
 }
 
 void destroy_tiles() {

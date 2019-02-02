@@ -126,7 +126,7 @@ static void interface_readline(struct Interface *i,
 
 	char *buffer = malloc(len * sizeof(char));
 	if (!buffer) {
-		mega_die(i, "malloc(): %i", errno);
+		die("malloc(): %i", errno);
 	}
 	memset(buffer, 0, len);
 
@@ -139,7 +139,7 @@ static void interface_readline(struct Interface *i,
 		if (index >= len - 1) {	// out of window
 			len = len * 2;
 			buffer = realloc(buffer, len);
-			if (!buffer) mega_die(i, "realloc(): %i", errno);
+			if (!buffer) die("realloc(): %i", errno);
 		}
 		if (c == KEY_BACKSPACE || c == ALT_KEYBACKSPACE) { // backspace
 			i->Move(i->console_win, i->console_win->rows - 1, index--);
@@ -153,11 +153,15 @@ static void interface_readline(struct Interface *i,
 	}
 	buffer[index] = '\0';
 	len = strlen(buffer);
+	if (len < 1) {
+		input->content = NULL;
+		return;
+	}
 
 	input->length = len + 1; // include null byte
 	input->content = malloc(input->length*sizeof(char));
 	if (!input->content) {
-		mega_die(i, "malloc(): %i", errno);
+		die("malloc(): %i", errno);
 	}
 	memcpy(input->content, buffer, input->length);
 	fpopList(&i->console_buffer);

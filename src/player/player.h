@@ -6,7 +6,7 @@
 struct Player {
 	char ch;
 	char name[32];
-	int xpos, ypos;
+	int xpos, ypos, zpos;
 };
 
 void player_Init(
