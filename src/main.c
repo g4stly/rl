@@ -23,9 +23,13 @@ int main(int argc, char **argv)
 	struct InterfaceInput input;
 
 	worldMap_Draw(&i, &m);
+	fprintf(stderr, "initially drawn\n");
 	while ((result = worldMap_GetInput(&i, &m, &input))) {
+		fprintf(stderr, "got input!\n");
 		worldMap_Step(&i, &m, &input);
+		fprintf(stderr, "stepped!\n");
 		worldMap_Draw(&i, &m);
+		fprintf(stderr, "drawn\n");
 	}
 
 	worldMap_Shutdown(&m);

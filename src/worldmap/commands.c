@@ -39,7 +39,10 @@ static int move_cmd(struct Interface *ui, struct WorldMap *m, char **argv, int a
 	}
 
 	int targeti = targety * lvl.cols + targetx;
-	if (targeti < 0 || targeti >= lvl.cols * lvl.rows) { 
+	if (targeti >= lvl.cols * lvl.rows
+		|| targeti < 0 || targetx < 0
+		|| targetx >= lvl.cols) { 
+
 		ui->WriteLine(ui, "Out of map bounds!");
 		return -1;
 	}

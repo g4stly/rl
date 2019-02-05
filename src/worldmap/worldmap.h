@@ -3,18 +3,21 @@
 
 #include "../player/player.h"
 #include "../interface/interface.h"
+#include "../list/list.h"
 
 #define CMD_NAME_LEN 	12
 
 struct Tile {
 	char ch;
 	int wall;
+	// should there be a pointer to an entity here?
 };
 
 struct Map {
 	// array
 	int cols, rows;
 	struct Tile **map;
+	struct ListNode *entities; // points to struct Entity
 };
 
 struct WorldMap {
@@ -22,9 +25,12 @@ struct WorldMap {
 	struct Player *player;
 };
 
+
 struct Command {
 	char name[CMD_NAME_LEN];
-	int (*func)(struct Interface *ui, struct WorldMap *m, char **argv, int argc);
+	int (*func)(struct Interface *ui, 
+		struct WorldMap *m, 
+		char **argv, int argc);
 };
 
 

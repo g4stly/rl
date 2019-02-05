@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include "tiles.h"
-#include "../util.h"
+#include "../../util.h"
 
 
 const char *const tile_names[TILES] = {"wall", "floor"};

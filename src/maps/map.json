@@ -9,7 +9,7 @@
 			"cols":80,
 			"hollow":true,
 			"tile":"wall",
-			"structues":[
+			"structures":[
 				{
 					"xpos":10,
 					"ypos":3,

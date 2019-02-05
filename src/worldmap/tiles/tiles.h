@@ -2,7 +2,7 @@
 #define tiles_h_
 
 #ifndef worldmap_h_
-#include "worldmap.h"
+#include "../worldmap.h"
 #endif
 
 #define TILES 2

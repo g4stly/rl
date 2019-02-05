@@ -2,7 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include "worldmap.h"
-#include "tiles.h"
+#include "tiles/tiles.h"
+#include "entity/entity.h"
 #include "../list/list.h"
 #include "../util.h"
 
@@ -249,11 +250,16 @@ void load_level(struct Map *m, const char *filename)
 	if (!m->map) { die("paint_level(): malloc():"); }
 
 	paint_level(m, l, l->xpos, l->ypos);
+
+	// entities
+	fprintf(stderr, "spawning entities\n");
+	entity_Spawn(&m->entities, ENTITY_GHOST);
 }
 
 void unload_level(struct Map *m)
 {
 	free(m->map); /* malloc()'d load_level() */
+	fpopList(&m->entities);	/* malloc()'d entity_Spawn() */
 }
 
 #undef FIELDS

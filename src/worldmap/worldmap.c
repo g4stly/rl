@@ -4,7 +4,8 @@
 #include <string.h>
 #include <ncurses.h>
 #include "worldmap.h"
-#include "tiles.h"
+#include "tiles/tiles.h"
+#include "entity/entity.h"
 #include "../interface/interface.h"
 #include "../util.h"
 
@@ -40,16 +41,16 @@ static int console_read(struct Interface *ui, struct WorldMap *m, struct Interfa
 	return result;
 }
 
-
 void worldMap_Init(struct WorldMap *map)
 {
 	init_tiles();
 	load_commands();
 	memset(map->levels, 0, sizeof(struct Map) * 5);
 	load_level(&map->levels[0], "src/maps/map.json");
+	fprintf(stderr, "world map initialized");
 }
 
-static char command_buffer = 0;	// LOL
+static char command_buffer = 0;	// LOL	// TODO: why is this funny?
 static char *const move_literal = "move";
 static char * north[] = {move_literal, "north"};
 static char * south[] = {move_literal, "south"};
@@ -102,23 +103,53 @@ void worldMap_Step(struct Interface *ui,
 
 void worldMap_Draw(struct Interface *ui, struct WorldMap *map)
 {
-	struct Map *m = &map->levels[0];
+	struct Map *m = &map->levels[map->player->zpos];
 	struct Window *w = ui->game_win;
+	
+	// walk entities, keep track of index to draw them
+	struct Entity *entities[m->rows * m->cols];
+	memset(entities, '\0', sizeof(struct Entity *) * m->rows * m->cols);
+	struct ListNode *current = m->entities;
+	while (current) {
+		struct Entity *e = (struct Entity *) current->data;
+		int entityi = e->ypos * m->cols + e->xpos;
+		if (entityi < m->rows * m->cols && entityi > 0) {
+			entities[entityi] = e;
+			fprintf(stderr, "added entity %i\n", entityi);
+		}
+		current = current->next;
+	}
+
+	fprintf(stderr, "main draw\n");
+	char target;
 	int mapi, mapy, mapx;
 	int centerx = (w->cols/2);
 	int centery = (w->rows/2);
 	for (int y = 0; y < w->rows; y++) {
 		mapy = map->player->ypos - (w->rows/2) + y;
 		for (int x = 0; x < w->cols; x++) {
+			fprintf(stderr, "%i\n%i\n%i\n%i\n====\n", map->player->xpos, map->player->ypos,
+					w->cols, w->rows);
 			mapx = map->player->xpos - (w->cols/2) + x;
 			mapi = mapy * m->cols + mapx;
+
+			fprintf(stderr, "mapx: %i\nmapi: %i\n", mapx, mapi);
+			if (mapi >= m->cols * m->rows || mapi < 0) {
+				target = ' '; 
+			} else { 
+				target = m->map[mapi]->ch;
+				if (entities[mapi]) { target = entities[mapi]->ch; }
+			}
+
+			fprintf(stderr, "target: %c\n", target);
 			mvwaddch(w->win, y, x, 
 				(mapi < 0 || mapi >= m->cols * m->rows) 
 				|| (mapx < 0 || mapx >= m->cols)
 				|| (mapy < 0 || mapy >= m->rows)
-				? ' ' : m->map[mapi]->ch);
+				? ' ' : target);
 		}
 	}
+
 	mvwaddch(w->win, centery, centerx, map->player->ch);
 	wrefresh(ui->game_win->win);
 }
