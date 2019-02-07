@@ -7,6 +7,16 @@
 #define MAX_INPUT_LENGTH 256
 #define ALT_KEYBACKSPACE 127
 
+#define WHITEBLACK 	1
+#define REDBLACK 	2
+#define GREENBLACK	3
+#define YELLOWBLACK	4
+#define BLUEBLACK	5
+#define MAGENTABLACK	6
+#define CYANBLACK	7
+
+#define BLACKBLUE	8
+
 struct Window {
 	int border;
 	int rows;

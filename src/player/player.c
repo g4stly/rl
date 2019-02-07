@@ -7,4 +7,5 @@ void player_Init(struct Interface *i,
 	char *name = "Elizabeth";
 	memcpy(p->name, name, strlen(name)+1);
 	p->zpos = 0;
+	p->color = WHITEBLACK;
 }

@@ -20,9 +20,9 @@ static int move_cmd(struct Interface *ui, struct WorldMap *m, char **argv, int a
 		return 1;
 	}
 
-	int targetx = m->player->xpos;
-	int targety = m->player->ypos;
-	struct Map lvl = m->levels[m->player->zpos];
+	int targetx = m->player.xpos;
+	int targety = m->player.ypos;
+	struct Map lvl = m->levels[m->player.zpos];
 	switch (*argv[1]) {
 	case 'n':
 		targety -= 1;
@@ -52,8 +52,8 @@ static int move_cmd(struct Interface *ui, struct WorldMap *m, char **argv, int a
 		return -1;
 	}
 
-	m->player->xpos = targetx;
-	m->player->ypos = targety;
+	m->player.xpos = targetx;
+	m->player.ypos = targety;
 
 	return 1;
 }

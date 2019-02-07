@@ -5,6 +5,7 @@
 
 struct Player {
 	char ch;
+	int color;
 	char name[32];
 	int xpos, ypos, zpos;
 };

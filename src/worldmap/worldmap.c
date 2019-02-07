@@ -46,6 +46,13 @@ void worldMap_Init(struct WorldMap *map)
 	init_tiles();
 	load_commands();
 	memset(map->levels, 0, sizeof(struct Map) * 5);
+
+	map->player.ch = '@';
+	map->player.color = REDBLACK;
+	map->player.xpos = 1;
+	map->player.ypos = 1;
+	map->player.zpos = 0;
+
 	load_level(&map->levels[0], "src/maps/map.json");
 	fprintf(stderr, "world map initialized");
 }
@@ -103,7 +110,7 @@ void worldMap_Step(struct Interface *ui,
 
 void worldMap_Draw(struct Interface *ui, struct WorldMap *map)
 {
-	struct Map *m = &map->levels[map->player->zpos];
+	struct Map *m = &map->levels[map->player.zpos];
 	struct Window *w = ui->game_win;
 	
 	// walk entities, keep track of index to draw them
@@ -120,28 +127,33 @@ void worldMap_Draw(struct Interface *ui, struct WorldMap *map)
 		current = current->next;
 	}
 
-	fprintf(stderr, "main draw\n");
 	char target;
+	int target_color;
 	int mapi, mapy, mapx;
 	int centerx = (w->cols/2);
 	int centery = (w->rows/2);
 	for (int y = 0; y < w->rows; y++) {
-		mapy = map->player->ypos - (w->rows/2) + y;
+		mapy = map->player.ypos - (w->rows/2) + y;
 		for (int x = 0; x < w->cols; x++) {
-			fprintf(stderr, "%i\n%i\n%i\n%i\n====\n", map->player->xpos, map->player->ypos,
-					w->cols, w->rows);
-			mapx = map->player->xpos - (w->cols/2) + x;
+			mapx = map->player.xpos - (w->cols/2) + x;
 			mapi = mapy * m->cols + mapx;
 
 			fprintf(stderr, "mapx: %i\nmapi: %i\n", mapx, mapi);
 			if (mapi >= m->cols * m->rows || mapi < 0) {
-				target = ' '; 
+				target = '?'; 
+				target_color = REDBLACK;
 			} else { 
+				fprintf(stderr, "found\n");
 				target = m->map[mapi]->ch;
-				if (entities[mapi]) { target = entities[mapi]->ch; }
+				target_color = m->map[mapi]->color;
+				if (entities[mapi]) { 
+					target = entities[mapi]->ch; 
+					target_color = entities[mapi]->color;
+				}
 			}
 
-			fprintf(stderr, "target: %c\n", target);
+			fprintf(stderr, "color: %i\n", target_color);
+			wattron(ui->game_win->win, COLOR_PAIR(target_color));
 			mvwaddch(w->win, y, x, 
 				(mapi < 0 || mapi >= m->cols * m->rows) 
 				|| (mapx < 0 || mapx >= m->cols)
@@ -150,7 +162,9 @@ void worldMap_Draw(struct Interface *ui, struct WorldMap *map)
 		}
 	}
 
-	mvwaddch(w->win, centery, centerx, map->player->ch);
+	wattron(ui->game_win->win, COLOR_PAIR(map->player.color));
+	mvwaddch(w->win, centery, centerx, map->player.ch);
+
 	wrefresh(ui->game_win->win);
 }
 

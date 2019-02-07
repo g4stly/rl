@@ -22,6 +22,7 @@ void entity_Spawn(struct ListNode **entities, int entityID)
 	if (!e) { die("malloc():"); }
 	fprintf(stderr, "spawning\n");
 	e->ch = 'E';
+	e->color = WHITEBLACK;
 	e->xpos = 2;
 	e->ypos = 3;
 	e->AI = AI_say_hello;

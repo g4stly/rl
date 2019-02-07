@@ -9,6 +9,7 @@
 
 struct Entity {
 	char ch;
+	int color;
 	int xpos, ypos;
 	void (*AI)(struct Entity *self,
 		struct Interface *ui, 

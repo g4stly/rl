@@ -9,6 +9,7 @@
 
 struct Tile {
 	char ch;
+	int color;
 	int wall;
 	// should there be a pointer to an entity here?
 };
@@ -22,7 +23,7 @@ struct Map {
 
 struct WorldMap {
 	struct Map levels[5];	
-	struct Player *player;
+	struct Player player;
 };
 
 

@@ -1,7 +1,7 @@
 {
 	"rows":80,
 	"cols":80,
-	"tile":"floor",
+	"tile":"grass",
 	"structures": 
 	[
 		{
@@ -15,15 +15,7 @@
 					"ypos":3,
 					"rows":10,
 					"cols":14,
-					"tile":"floor",
-					"structures":[
-						{
-							"rows":10,
-							"cols":14,
-							"tile":"wall",
-							"hollow":true
-						}
-					]
+					"tile":"water"
 				}
 			]	
 		}

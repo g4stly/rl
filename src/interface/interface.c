@@ -189,6 +189,18 @@ void interface_Init(struct Interface *i)
 	curs_set(0);
 	keypad(stdscr, true);
 
+	// do the colors
+	start_color();
+	init_pair(WHITEBLACK, COLOR_WHITE, COLOR_BLACK);
+	init_pair(REDBLACK, COLOR_RED, COLOR_BLACK);
+	init_pair(GREENBLACK, COLOR_GREEN, COLOR_BLACK);
+	init_pair(YELLOWBLACK, COLOR_YELLOW, COLOR_BLACK);
+	init_pair(BLUEBLACK, COLOR_BLUE, COLOR_BLACK);
+	init_pair(MAGENTABLACK, COLOR_MAGENTA, COLOR_BLACK);
+	init_pair(CYANBLACK, COLOR_CYAN, COLOR_BLACK);
+
+	init_pair(BLACKBLUE, COLOR_BLACK, COLOR_BLUE);
+
 	// create windows
 	int rows, cols;
 	getmaxyx(stdscr, rows, cols);
