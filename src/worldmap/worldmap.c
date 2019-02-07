@@ -106,6 +106,14 @@ int worldMap_GetInput(struct Interface *ui,
 void worldMap_Step(struct Interface *ui, 
 	struct WorldMap *map, struct InterfaceInput *input)
 {
+	struct Map *m = &map->levels[map->player.zpos];
+	struct ListNode *current = m->entities;
+	while (current) {
+		struct Entity *e = (struct Entity *) current->data;
+		if (!e) { die("NULL entity!"); }
+		if (e->AI) { e->AI(e, ui, map); }
+		current = current->next;
+	}
 }
 
 void worldMap_Draw(struct Interface *ui, struct WorldMap *map)
@@ -119,6 +127,8 @@ void worldMap_Draw(struct Interface *ui, struct WorldMap *map)
 	struct ListNode *current = m->entities;
 	while (current) {
 		struct Entity *e = (struct Entity *) current->data;
+		if (!e) { die("NULL entity!"); }
+
 		int entityi = e->ypos * m->cols + e->xpos;
 		if (entityi < m->rows * m->cols && entityi > 0) {
 			entities[entityi] = e;
