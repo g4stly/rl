@@ -1,23 +1,15 @@
 {
-	"rows":80,
-	"cols":80,
-	"tile":"grass",
-	"structures": 
-	[
+	"rows":160, "cols":160, "tile":"grass",
+	"structures":[
 		{
-			"rows":80,
-			"cols":80,
-			"hollow":true,
-			"tile":"wall",
+			"xpos":70, "ypos":20, "rows":10, "cols":10, "tile":"floor",
 			"structures":[
-				{
-					"xpos":10,
-					"ypos":3,
-					"rows":10,
-					"cols":14,
-					"tile":"water"
-				}
-			]	
+				{ "rows": 2, "cols": 10, "tile":"wall" },
+				{ "rows": 10, "cols": 2, "tile":"wall" },
+				{ "xpos": 8, "cols":2, "rows": 10, "tile":"wall" },
+				{ "ypos": 8, "cols":6, "rows": 2, "tile":"wall" },
+				{ "ypos": 8, "xpos":8, "cols":2, "rows": 2, "tile":"wall" }
+			]
 		}
 	]
 }

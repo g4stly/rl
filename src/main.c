@@ -18,7 +18,7 @@ int main(int argc, char **argv)
 
 	worldMap_Draw(&i, &m);
 	while ((result = worldMap_GetInput(&i, &m, &input))) {
-		worldMap_Step(&i, &m, &input);
+		worldMap_Step(&i, &m, &input, result);
 		worldMap_Draw(&i, &m);
 	}
 

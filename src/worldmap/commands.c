@@ -2,6 +2,7 @@
 #include <string.h>
 #include "../interface/interface.h"
 #include "../list/list.h"
+#include "entity/entity.h"
 #include "../util.h"
 #include "worldmap.h"
 
@@ -13,11 +14,39 @@ static int look_cmd(struct Interface *ui, struct WorldMap *m, char **argv, int a
 	return 1;
 }
 
+static int spawn_cmd(struct Interface *ui, struct WorldMap *m, char **argv, int argc)
+{
+	if (argc != 4) {
+		ui->WriteLine(ui, "USAGE: %s [ch] [x] [y]", argv[0]);
+		return -1;
+	}
+
+	struct Map *lvl = &m->levels[m->player.zpos];
+
+	int targetx = atoi(argv[2]);
+	int targety = atoi(argv[3]);
+	int targeti = (targety * lvl->cols) + targetx;
+	if (targeti < 0 || targeti >= lvl->cols * lvl->rows) {
+		ui->WriteLine(ui, "Target coordinates do not exist!");
+		return -1;
+	}
+
+	if (lvl->entity_layer[targeti]) {
+		ui->WriteLine(ui, "Entity exists already at index %i", targeti);
+		return -1;
+	}
+
+	entity_Spawn(&(lvl->entities),
+		*argv[1], CYANBLACK, targetx, targety);
+
+	return -1;
+}
+
 static int move_cmd(struct Interface *ui, struct WorldMap *m, char **argv, int argc)
 {
 	if (argc < 2) { 
 		ui->WriteLine(ui, "move where?!?");
-		return 1;
+		return -1;
 	}
 
 	int targetx = m->player.xpos;
@@ -50,6 +79,17 @@ static int move_cmd(struct Interface *ui, struct WorldMap *m, char **argv, int a
 	if (lvl.map[targeti]->wall) {
 		// ui->WriteLine(ui, "You walk straight into a wall!");
 		return -1;
+	}
+
+	if (lvl.entity_layer[targeti]) {
+		struct Entity *e = lvl.entity_layer[targeti];
+		int damage = m->player.att - e->def;
+		if (damage < 0) damage = 0;
+		e->hp -= damage;
+		ui->WriteLine(ui, 
+			"you attack for %i points of damage; remaining enemy health (%i/%i)", 
+			damage, e->hp, e->con);
+		return 1;
 	}
 
 	m->player.xpos = targetx;
@@ -131,6 +171,7 @@ static void mkcmd(const char *name, int (*fn)(struct Interface *, struct WorldMa
 void load_commands(void)
 {
 	mkcmd("look", look_cmd);
+	mkcmd("spawn", spawn_cmd);
 	mkcmd("echo", echo_cmd);
 	mkcmd("move", move_cmd);
 	mkcmd("quit", quit_cmd);

@@ -8,6 +8,7 @@ struct Player {
 	int color;
 	char name[32];
 	int xpos, ypos, zpos;
+	int con, hp, att, def, dex, luck;
 };
 
 void player_Init(

@@ -5,17 +5,17 @@
 #include "../worldmap.h"
 #endif
 
-#define ENTITY_GHOST 0
-
 struct Entity {
 	char ch;
 	int color;
 	int xpos, ypos;
-	void (*AI)(struct Entity *self,
+	int Id, con, hp, att, def;
+	int (*AI)(struct Entity *self,
 		struct Interface *ui, 
 		struct WorldMap *m);
 };
 
-void entity_Spawn(struct ListNode **entities, int entityID);
+void entity_Spawn(struct ListNode **entities, char ch, int color, int xpos, int ypos);
+void entity_Rm(struct ListNode **entities, int entityId);
 
 #endif

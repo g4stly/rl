@@ -249,16 +249,21 @@ void load_level(struct Map *m, const char *filename)
 	m->map = malloc(sizeof(struct Tile *) * m->cols * m->rows);
 	if (!m->map) { die("paint_level(): malloc():"); }
 
+	/* freed unload_level() */
+	m->entity_layer = malloc(sizeof(struct Entity *) * m->cols * m->rows);
+	if (!m->entity_layer) { die("paint_level(): malloc():"); }
+
 	paint_level(m, l, l->xpos, l->ypos);
 
 	// entities
-	fprintf(stderr, "spawning entities\n");
-	entity_Spawn(&m->entities, ENTITY_GHOST);
+	// TODO: allow specification of entitiy location in map
+	//fprintf(stderr, "spawning entities\n");
 }
 
 void unload_level(struct Map *m)
 {
-	free(m->map); /* malloc()'d load_level() */
+	free(m->map); 		/* malloc()'d load_level() */
+	free(m->entity_layer); 	/* malloc()'d load_level() */
 	fpopList(&m->entities);	/* malloc()'d entity_Spawn() */
 }
 

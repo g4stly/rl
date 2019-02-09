@@ -10,18 +10,14 @@
 #include "../util.h"
 
 
-static int console_read(struct Interface *ui, struct WorldMap *m, struct InterfaceInput *input)
+
+static int exec_string(struct Interface *ui, struct WorldMap *m, const char *const input)
 {
-	ui->ReadLine(ui, input);
-	if (input->content == NULL) {
-		return 1;
-	}
-	ui->WriteLine(ui, input->content);
 	int result = 0;
-	char **words = split_string(input->content, ' ');
+	char **words = split_string(input, ' ');
 	char *word;
 
-	while ((word = words[++result]));
+	while ((word = words[++result]));	// bad fucking ass
 	word = *words;
 
 	// test first word against entire list of commands
@@ -41,49 +37,56 @@ static int console_read(struct Interface *ui, struct WorldMap *m, struct Interfa
 	return result;
 }
 
+static int console_read(struct Interface *ui, struct WorldMap *m, struct InterfaceInput *input)
+{
+	ui->ReadLine(ui, input);
+	if (input->content == NULL) {
+		return 1;
+	}
+	ui->WriteLine(ui, input->content);
+	return exec_string(ui, m, input->content);
+}
+
 void worldMap_Init(struct WorldMap *map)
 {
 	init_tiles();
 	load_commands();
 	memset(map->levels, 0, sizeof(struct Map) * 5);
 
+	map->time = 0;
+
 	map->player.ch = '@';
 	map->player.color = REDBLACK;
-	map->player.xpos = 1;
-	map->player.ypos = 1;
+	map->player.xpos = 72;
+	map->player.ypos = 22;
 	map->player.zpos = 0;
+	map->player.con = 10;
+	map->player.hp = 10;
+	map->player.att = 5;
+	map->player.def = 5;
+	map->player.dex = 5;
+	map->player.luck = 5;
 
 	load_level(&map->levels[0], "src/maps/map.json");
 	fprintf(stderr, "world map initialized");
 }
 
-static char command_buffer = 0;	// LOL	// TODO: why is this funny?
-static char *const move_literal = "move";
-static char * north[] = {move_literal, "north"};
-static char * south[] = {move_literal, "south"};
-static char * east[] = {move_literal, "east"};
-static char * west[] = {move_literal, "west"};
 static int rl(struct Interface *ui,
 	struct WorldMap *map, struct InterfaceInput *input, char c)
 {
 	switch (c) {
 	case 'l':
-		command(ui, map, "look", NULL, 0);
-		break;
-	case 'r':
-		return rl(ui, map, input, command_buffer);
+		return command(ui, map, "look", NULL, 0);
+	case 'p': 
+		return exec_string(ui, map, "spawn G 75 25");
 	case 'w':
-		command(ui, map, north[0], north, 2);
-		break;
+		return exec_string(ui, map, "move north");
 	case 'a':
-		command(ui, map, west[0], west, 2);
-		break;
+		return exec_string(ui, map, "move west");
 	case 's':
-		command(ui, map, south[0], south, 2);
-		break;
+		return exec_string(ui, map, "move south");
 	case 'd':
-		command(ui, map, east[0], east, 2);
-		break;
+		return exec_string(ui, map, "move east");
 	case 't':
 		return console_read(ui, map, input);
 	case 'q':
@@ -93,7 +96,6 @@ static int rl(struct Interface *ui,
 		ui->WriteLine(ui, "%c: Not a valid command!", c);
 		break;
 	}
-	if (c != 'r') command_buffer = c;
 	return 1;
 }
 
@@ -103,39 +105,51 @@ int worldMap_GetInput(struct Interface *ui,
 	return rl(ui, map, input, ui->ReadKey(ui));
 }
 
-void worldMap_Step(struct Interface *ui, 
-	struct WorldMap *map, struct InterfaceInput *input)
+void worldMap_Step(struct Interface *ui, struct WorldMap *map, 
+	struct InterfaceInput *input, int cmdResult)
 {
 	struct Map *m = &map->levels[map->player.zpos];
+
+	if (cmdResult > 0) { map->time++; }
+	memset(m->entity_layer, '\0', sizeof(struct Entity *) * m->cols * m->rows);
+
+	int entityi;
 	struct ListNode *current = m->entities;
 	while (current) {
 		struct Entity *e = (struct Entity *) current->data;
 		if (!e) { die("NULL entity!"); }
-		if (e->AI) { e->AI(e, ui, map); }
-		current = current->next;
-	}
-}
+		if (cmdResult > 0) {
+			if (e->hp <= 0) { 
+				entity_Rm(&m->entities, e->Id); 
+				return;
+			}
+			if (e->AI) { e->AI(e, ui, map); }
+		}
 
-void worldMap_Draw(struct Interface *ui, struct WorldMap *map)
-{
-	struct Map *m = &map->levels[map->player.zpos];
-	struct Window *w = ui->game_win;
-	
-	// walk entities, keep track of index to draw them
-	struct Entity *entities[m->rows * m->cols];
-	memset(entities, '\0', sizeof(struct Entity *) * m->rows * m->cols);
-	struct ListNode *current = m->entities;
-	while (current) {
-		struct Entity *e = (struct Entity *) current->data;
-		if (!e) { die("NULL entity!"); }
-
-		int entityi = e->ypos * m->cols + e->xpos;
+		entityi = e->ypos * m->cols + e->xpos;
 		if (entityi < m->rows * m->cols && entityi > 0) {
-			entities[entityi] = e;
-			fprintf(stderr, "added entity %i\n", entityi);
+			m->entity_layer[entityi] = e;
 		}
 		current = current->next;
 	}
+
+}
+
+static void draw_stats(struct Interface *ui, struct WorldMap *map) {
+	struct Map *m = &map->levels[map->player.zpos];
+	struct Window *w = ui->status_win;
+	
+	mvwprintw(w->win, 1, 1, "HP: (%i/%i)", map->player.hp, map->player.con);
+	mvwprintw(w->win, 2, 1, "att: %i\tdef: %i", map->player.att, map->player.def);
+	mvwprintw(w->win, 3, 1, "dex: %i\tluck: %i", map->player.dex, map->player.luck);
+	mvwprintw(w->win, 4, 1, "X: %i\tY: %i", map->player.xpos, map->player.ypos);
+	wrefresh(w->win);
+}
+
+void worldMap_Draw(struct Interface *ui, struct WorldMap *map)
+{	// TODO: split this function apart?
+	struct Map *m = &map->levels[map->player.zpos];
+	struct Window *w = ui->game_win;
 
 	char target;
 	int target_color;
@@ -148,34 +162,32 @@ void worldMap_Draw(struct Interface *ui, struct WorldMap *map)
 			mapx = map->player.xpos - (w->cols/2) + x;
 			mapi = mapy * m->cols + mapx;
 
-			fprintf(stderr, "mapx: %i\nmapi: %i\n", mapx, mapi);
-			if (mapi >= m->cols * m->rows || mapi < 0) {
-				target = '?'; 
-				target_color = REDBLACK;
-			} else { 
-				fprintf(stderr, "found\n");
+			if ((mapi < m->cols * m->rows && mapi >= 0)
+				&& (mapx >= 0 || mapx < m->cols) 
+				&& (mapy >= 0 || mapy < m->rows))
+			{	// TODO: more elegance
 				target = m->map[mapi]->ch;
 				target_color = m->map[mapi]->color;
-				if (entities[mapi]) { 
-					target = entities[mapi]->ch; 
-					target_color = entities[mapi]->color;
+				if (m->entity_layer[mapi]) { 
+					target = m->entity_layer[mapi]->ch; 
+					target_color = m->entity_layer[mapi]->color;
 				}
+			} else {
+				target = ' ';
+				target_color = WHITEBLACK;
 			}
 
-			fprintf(stderr, "color: %i\n", target_color);
-			wattron(ui->game_win->win, COLOR_PAIR(target_color));
-			mvwaddch(w->win, y, x, 
-				(mapi < 0 || mapi >= m->cols * m->rows) 
-				|| (mapx < 0 || mapx >= m->cols)
-				|| (mapy < 0 || mapy >= m->rows)
-				? ' ' : target);
+			wattron(w->win, COLOR_PAIR(target_color));
+			mvwaddch(w->win, y, x, target);
 		}
 	}
 
-	wattron(ui->game_win->win, COLOR_PAIR(map->player.color));
+	wattron(w->win, COLOR_PAIR(map->player.color));
 	mvwaddch(w->win, centery, centerx, map->player.ch);
 
-	wrefresh(ui->game_win->win);
+	wrefresh(w->win);
+
+	draw_stats(ui, map);
 }
 
 void worldMap_Shutdown(struct WorldMap *map)

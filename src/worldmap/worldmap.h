@@ -18,10 +18,12 @@ struct Map {
 	// array
 	int cols, rows;
 	struct Tile **map;
-	struct ListNode *entities; // points to struct Entity
+	struct Entity **entity_layer;	// we need to be able to INDEX by position
+	struct ListNode *entities; 	// as well as WALK all entities efficiently
 };
 
 struct WorldMap {
+	long long time;
 	struct Map levels[5];	
 	struct Player player;
 };
@@ -45,7 +47,8 @@ int worldMap_GetInput(
 void worldMap_Step(
 	struct Interface *ui, 
 	struct WorldMap *map, 
-	struct InterfaceInput *input);
+	struct InterfaceInput *input,
+	int cmdResult);
 
 void worldMap_Draw(
 	struct Interface *ui, 
