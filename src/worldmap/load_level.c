@@ -29,7 +29,7 @@
 #define HOLLOW 5
 #define TILE 6
 
-#define FILE_SIZE 1024
+#define FILE_SIZE 2048
 #define EMAPSYNTAX -4
 #define EPARSEPM -5
 #define EMAPVIOLATION -6

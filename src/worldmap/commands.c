@@ -77,7 +77,6 @@ static int move_cmd(struct Interface *ui, struct WorldMap *m, char **argv, int a
 	}
 
 	if (lvl.map[targeti]->wall) {
-		// ui->WriteLine(ui, "You walk straight into a wall!");
 		return -1;
 	}
 

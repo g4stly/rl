@@ -1,3 +1,4 @@
+#include <time.h>
 #include <math.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -49,6 +50,7 @@ static int console_read(struct Interface *ui, struct WorldMap *m, struct Interfa
 
 void worldMap_Init(struct WorldMap *map)
 {
+	srand(time(NULL));
 	init_tiles();
 	load_commands();
 	memset(map->levels, 0, sizeof(struct Map) * 5);
@@ -74,11 +76,17 @@ void worldMap_Init(struct WorldMap *map)
 static int rl(struct Interface *ui,
 	struct WorldMap *map, struct InterfaceInput *input, char c)
 {
+	char *buf;
 	switch (c) {
 	case 'l':
 		return command(ui, map, "look", NULL, 0);
 	case 'p': 
-		return exec_string(ui, map, "spawn G 75 25");
+		buf = malloc(sizeof(char) * 32);
+		if (!buf) { die("rl(): malloc():"); }
+		snprintf(buf, 32, "spawn E %i %i", map->player.xpos, map->player.ypos);
+		int rv = exec_string(ui, map, buf);
+		free(buf);
+		return rv;
 	case 'w':
 		return exec_string(ui, map, "move north");
 	case 'a':
@@ -121,7 +129,7 @@ void worldMap_Step(struct Interface *ui, struct WorldMap *map,
 		if (cmdResult > 0) {
 			if (e->hp <= 0) { 
 				entity_Rm(&m->entities, e->Id); 
-				return;
+				goto next;
 			}
 			if (e->AI) { e->AI(e, ui, map); }
 		}
@@ -130,6 +138,7 @@ void worldMap_Step(struct Interface *ui, struct WorldMap *map,
 		if (entityi < m->rows * m->cols && entityi > 0) {
 			m->entity_layer[entityi] = e;
 		}
+		next:
 		current = current->next;
 	}
 

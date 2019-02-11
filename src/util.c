@@ -29,6 +29,16 @@ static char *read_until(const char *string, char token)
 	return word;
 }
 
+int randomInt(int limit)
+{
+	int rv;
+	int divisor = RAND_MAX/(limit+1);
+	do {
+		rv = rand() / divisor;
+	} while (rv > limit);
+	return rv;
+}
+
 char **split_string(const char *string, char token)
 {
 	char *word;
